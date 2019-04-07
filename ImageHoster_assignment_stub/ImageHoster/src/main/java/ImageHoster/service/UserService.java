@@ -32,31 +32,6 @@ public class UserService {
         }
     }
 
-    //Function for Password validation
-    //"Password must contain atleast 1 alphabet, 1 number & 1 special character"
-    public boolean passwordValidation( String password)
-    {
 
-        String upperCaseChars = "(.*[A-Z].*)";
-        String lowerCaseChars = "(.*[a-z].*)";
-        if ((!password.matches(upperCaseChars ))&&(!password.matches(lowerCaseChars)))
-        {
-            return false;
-        }
-
-
-        String numbers = "(.*[0-9].*)";
-        if (!password.matches(numbers ))
-        {
-            return false;
-        }
-        String specialChars = "(.*[,~,!,@,#,$,%,^,&,*,(,),-,_,=,+,[,{,],},|,;,:,<,>,/,?].*$)";
-        if (!password.matches(specialChars ))
-        {
-            return false;
-        }
-
-        return true;
-    }
 
 }

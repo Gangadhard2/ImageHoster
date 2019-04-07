@@ -44,16 +44,15 @@ public class UserController {
 
         String passwd = user.getPassword();
         String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
-        if(userService.passwordValidation(passwd)){
+        if(passwordValidation(passwd)){
             userService.registerUser(user);
-            return "redirect:/users/login";
+            return "users/login";
         }
         else{
             model.addAttribute("passwordTypeError",error);
             model.addAttribute("User",user);
-            return "/users/registration";
+            return "users/registration";
         }
-
     }
 
     //This controller method is called when the request pattern is of type 'users/login'
@@ -89,5 +88,32 @@ public class UserController {
         List<Image> images = imageService.getAllImages();
         model.addAttribute("images", images);
         return "index";
+    }
+
+    //Function for Password validation
+    //"Password must contain atleast 1 alphabet, 1 number & 1 special character"
+    public boolean passwordValidation( String password)
+    {
+
+        String upperCaseChars = "(.*[A-Z].*)";
+        String lowerCaseChars = "(.*[a-z].*)";
+        if ((!password.matches(upperCaseChars ))&&(!password.matches(lowerCaseChars)))
+        {
+            return false;
+        }
+
+
+        String numbers = "(.*[0-9].*)";
+        if (!password.matches(numbers ))
+        {
+            return false;
+        }
+        String specialChars = "(.*[,~,!,@,#,$,%,^,&,*,(,),-,_,=,+,[,{,],},|,;,:,<,>,/,?].*$)";
+        if (!password.matches(specialChars ))
+        {
+            return false;
+        }
+
+        return true;
     }
 }
