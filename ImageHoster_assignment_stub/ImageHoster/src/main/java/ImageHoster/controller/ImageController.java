@@ -1,8 +1,10 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+
 import java.util.*;
 
 @Controller
@@ -26,6 +29,9 @@ public class ImageController {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private CommentService commentService;
 
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
@@ -47,8 +53,11 @@ public class ImageController {
     //this list is then sent to 'images/image.html' file and the tags are displayed
     @RequestMapping("/images/{id}/{title}")
     public String showImage(@PathVariable("title") String title, @PathVariable("id") Integer id, Model model) {
-        Image image = imageService.getImageByTitle(title,id);
+        Image image = imageService.getImage(id);
+        List<Comment> comments  = commentService.getAllComments(id);
+        model.addAttribute("comments",comments);
         model.addAttribute("image", image);
+        model.addAttribute("title", title);
         model.addAttribute("tags", image.getTags());
         return "images/image";
     }
@@ -98,7 +107,7 @@ public class ImageController {
         User user=(User)session.getAttribute("loggeduser");
 
         String error = "Only the owner of the image can edit the image";
-        if(user.getUsername().equals(image.getUser().getUsername())){
+        if(user.getId()==(image.getUser().getId())){
 
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("image", image);
@@ -107,7 +116,8 @@ public class ImageController {
         }
 
         else{
-
+            List<Comment> comments  = commentService.getAllComments(imageId);
+            model.addAttribute("comments",comments);
             model.addAttribute("editError", error);
             model.addAttribute("image", image);
             model.addAttribute("tags", image.getTags());
@@ -160,20 +170,22 @@ public class ImageController {
 
         User user=(User)session.getAttribute("loggeduser");
         Image image = imageService.getImage(imageId);
-        String error = "Only the owner of the image can delete the imag";
+        String error = "Only the owner of the image can delete the image";
 
-        if(image.getUser().getUsername().equals(user.getUsername())){
+        if(image.getUser().getId()==user.getId()){
             imageService.deleteImage(imageId);
             return "redirect:/images";
         }
         else{
+            List<Comment> comments  = commentService.getAllComments(imageId);
+            model.addAttribute("comments",comments);
             model.addAttribute("deleteError",error);
             model.addAttribute("image",image);
             model.addAttribute("tags", image.getTags());
             return "images/image";
         }
-
     }
+
 
 
     //This method converts the image to Base64 format
